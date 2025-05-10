@@ -20,6 +20,7 @@ RUN apt update && apt install -y \
     xrdp \
     ca-certificates \
     xorgxrdp \
+    xdotool \
     xfce4 \
     xfce4-terminal \
     dumb-init \
