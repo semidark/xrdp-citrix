@@ -12,6 +12,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 ARG USERNAME
 ARG PASSWORD
 
+# Set USERNAME as environment variable for runtime
+ENV CONTAINER_USER=${USERNAME}
+
 # Install minimal required packages
 RUN apt update && apt install -y \
     xrdp \
@@ -75,11 +78,6 @@ RUN useradd -m -s /bin/bash ${USERNAME} \
     && echo "${USERNAME}:${PASSWORD}" | chpasswd \
     && usermod -aG sudo ${USERNAME}
 
-# Create Xfce autostart for German keyboard layout
-RUN mkdir -p /home/${USERNAME}/.config/autostart && \
-    echo "[Desktop Entry]\nType=Application\nName=Keyboard Layout\nExec=setxkbmap de\nStartupNotify=false\nTerminal=false\nHidden=false" > /home/${USERNAME}/.config/autostart/keyboard-layout.desktop && \
-    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
-
 # Define volume for user home directory
 VOLUME /home/${USERNAME}
 
@@ -93,6 +91,12 @@ RUN echo "#!/bin/sh" > /etc/xrdp/startwm.sh \
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
+# Ensure keyboard configuration exists in user home\n\
+mkdir -p /home/$CONTAINER_USER/.config/autostart\n\
+echo "[Desktop Entry]\nType=Application\nName=Keyboard Layout\nExec=setxkbmap de\nStartupNotify=false\nTerminal=false\nHidden=false" > /home/$CONTAINER_USER/.config/autostart/keyboard-layout.desktop\n\
+chown -R $CONTAINER_USER:$CONTAINER_USER /home/$CONTAINER_USER/.config\n\
+\n\
+# Start services\n\
 mkdir -p /var/run/dbus\n\
 dbus-daemon --system\n\
 service xrdp start\n\
