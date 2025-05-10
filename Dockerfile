@@ -80,6 +80,9 @@ RUN mkdir -p /home/${USERNAME}/.config/autostart && \
     echo "[Desktop Entry]\nType=Application\nName=Keyboard Layout\nExec=setxkbmap de\nStartupNotify=false\nTerminal=false\nHidden=false" > /home/${USERNAME}/.config/autostart/keyboard-layout.desktop && \
     chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
 
+# Define volume for user home directory
+VOLUME /home/${USERNAME}
+
 # Set up Xfce session for XRDP
 RUN echo "#!/bin/sh" > /etc/xrdp/startwm.sh \
     && echo "export XDG_SESSION_DESKTOP=xfce" >> /etc/xrdp/startwm.sh \
