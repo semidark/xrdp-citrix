@@ -1,6 +1,7 @@
 # Remote Desktop Environment Docker Container
 
-A Docker container providing a full Xfce desktop environment accessible via RDP, based on Debian Bookworm.
+A Docker container providing a minimal Xfce desktop with an Citrix Workspace Client accessible via RDP, based on Debian Bookworm.
+Can be run on Raspberry (armhf) and amd64 Hardware to give you a very lightweight Citrix Client.
 
 ## Features
 
