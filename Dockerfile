@@ -1,8 +1,16 @@
+# Define build arguments for username and password without defaults
+ARG USERNAME
+ARG PASSWORD
+
 FROM debian:bookworm-slim
 #FROM dtcooper/raspberrypi-os:lite-bookworm
 
 # Avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Make build args available after FROM
+ARG USERNAME
+ARG PASSWORD
 
 # Install minimal required packages
 RUN apt update && apt install -y \
@@ -63,14 +71,14 @@ RUN echo 'XKBMODEL="pc105"\nXKBLAYOUT="de"\nXKBVARIANT=""\nXKBOPTIONS=""' > /etc
     && chmod +x /etc/profile.d/keyboard.sh
 
 # Create non-root user with sudo privileges
-RUN useradd -m -s /bin/bash user \
-    && echo "user:password" | chpasswd \
-    && usermod -aG sudo user
+RUN useradd -m -s /bin/bash ${USERNAME} \
+    && echo "${USERNAME}:${PASSWORD}" | chpasswd \
+    && usermod -aG sudo ${USERNAME}
 
 # Create Xfce autostart for German keyboard layout
-RUN mkdir -p /home/user/.config/autostart && \
-    echo "[Desktop Entry]\nType=Application\nName=Keyboard Layout\nExec=setxkbmap de\nStartupNotify=false\nTerminal=false\nHidden=false" > /home/user/.config/autostart/keyboard-layout.desktop && \
-    chown -R user:user /home/user/.config
+RUN mkdir -p /home/${USERNAME}/.config/autostart && \
+    echo "[Desktop Entry]\nType=Application\nName=Keyboard Layout\nExec=setxkbmap de\nStartupNotify=false\nTerminal=false\nHidden=false" > /home/${USERNAME}/.config/autostart/keyboard-layout.desktop && \
+    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
 
 # Set up Xfce session for XRDP
 RUN echo "#!/bin/sh" > /etc/xrdp/startwm.sh \

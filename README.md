@@ -36,6 +36,33 @@ Before building the image, you need to manually download the Citrix Workspace ap
 docker build -t rdp-desktop .
 ```
 
+With custom username and password:
+```bash
+docker build --build-arg USERNAME=custom_user --build-arg PASSWORD=secure_password -t rdp-desktop .
+```
+
+#### Using .env file for credentials (recommended)
+
+For better security, you can use a .env file to store your credentials instead of passing them as command line arguments:
+
+1. Create a `.env` file based on the example:
+```bash
+cp .env.example .env
+```
+
+2. Edit the `.env` file with your credentials:
+```
+USERNAME=custom_user
+PASSWORD=secure_password
+```
+
+3. Run the provided build script:
+```bash
+./build.sh
+```
+
+This approach prevents credentials from appearing in your command history.
+
 ### Running the container
 
 Basic usage:
@@ -47,7 +74,13 @@ docker run -d -p 3389:3389 --name rdp-desktop rdp-desktop
 With persistent home directory:
 
 ```bash
-docker run -d -p 3389:3389 -v rdp-home:/home/user --name rdp-desktop rdp-desktop
+docker run -d -p 3389:3389 -v rdp-home:/home/${USERNAME} --name rdp-desktop rdp-desktop
+```
+
+Or with explicit username:
+
+```bash
+docker run -d -p 3389:3389 -v rdp-home:/home/custom_user --name rdp-desktop rdp-desktop
 ```
 
 ### Connecting to the desktop
@@ -55,22 +88,25 @@ docker run -d -p 3389:3389 -v rdp-home:/home/user --name rdp-desktop rdp-desktop
 Connect using any RDP client (like Microsoft Remote Desktop) to:
 - Host: localhost (or your host IP)
 - Port: 3389
-- Username: user
-- Password: password
+- Username: The value of USERNAME build arg (default: user)
+- Password: The value of PASSWORD build arg (default: password)
 
 ## Customization
 
-### Changing the default password
+### Changing the default username and password
 
-Before building the image, modify the following line in the Dockerfile:
+Use build arguments when building the image:
+```bash
+docker build --build-arg USERNAME=custom_user --build-arg PASSWORD=secure_password -t rdp-desktop .
 ```
-&& echo "user:password" | chpasswd \
-```
+
+If not specified, the default values are:
+- Username: user
+- Password: password
 
 ### Adding additional software
 
 Add your required packages to the `apt-get install` command in the Dockerfile.
-
 
 ## Security Notes
 

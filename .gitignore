@@ -1,1 +1,5 @@
+# Ignore environment variables file with credentials
+.env
+
+# Build artifacts
 *.deb
